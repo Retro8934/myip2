@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мой IP-адрес</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-1: #f4f6fb;
+      --card-bg: #ffffff;
+      --text-primary: #0f1a2b;
+      --text-secondary: #5b6b82;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-dark: #2563eb;
+      --accent-light: #dbeafe;
+      --success: #10b981;
+      --success-light: #d1fae5;
+      --danger: #ef4444;
+      --danger-light: #fee2e2;
+      --warning: #f59e0b;
+      --warning-light: #fef3c7;
+      --border: #e2e8f0;
+      --shadow-lg: 0 20px 40px -12px rgba(15, 26, 43, 0.12);
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg-1);
+      background-image:
+        radial-gradient(circle at 15% 10%, rgba(59, 130, 246, 0.08), transparent 45%),
+        radial-gradient(circle at 85% 90%, rgba(139, 92, 246, 0.08), transparent 45%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrapper { width: 100%; max-width: 620px; }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 2.25rem;
+      box-shadow: var(--shadow-lg), 0 0 0 1px rgba(15, 26, 43, 0.03);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.75rem;
+    }
+
+    .header-title { display: flex; align-items: center; gap: 0.75rem; }
+
+    .logo {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 8px 20px -6px rgba(59, 130, 246, 0.5);
+    }
+
+    .header-text h1 {
+      font-size: 1.15rem; font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .header-text p {
+      font-size: 0.8rem; color: var(--text-muted);
+      font-weight: 500; margin-top: 2px;
+    }
+
+    .badge {
+      font-size: 0.7rem; font-weight: 600;
+      color: var(--accent); background: var(--accent-light);
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      display: flex; align-items: center; gap: 0.35rem;
+    }
+
+    .badge .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+    .section { margin-bottom: 1.25rem; }
+
+    .section-label {
+      font-size: 0.72rem; font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 0.6rem;
+      display: flex; align-items: center;
+      gap: 0.4rem; justify-content: space-between;
+    }
+
+    .ip-type-tag {
+      font-size: 0.65rem; font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: transparent;
+      transition: all 0.2s ease;
+    }
+
+    .ip-type-tag.v4 { color: #065f46; background: #d1fae5; }
+    .ip-type-tag.v6 { color: #7c2d12; background: #ffedd5; }
+
+    .ip-card {
+      background: linear-gradient(135deg, #f8faff 0%, #eef4ff 100%);
+      border: 1px solid #dbe7fb;
+      border-radius: 16px;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ip-card::after {
+      content: '';
+      position: absolute;
+      right: -30px; top: -30px;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.15), transparent 70%);
+    }
+
+    .ip-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      word-break: break-all;
+      line-height: 1.25;
+      position: relative; z-index: 1;
+      transition: font-size 0.15s ease;
+    }
+
+    .ip-value.v4 { font-size: 2.1rem; }
+    .ip-value.v6 { font-size: 1.35rem; }
+    .ip-value.placeholder { color: var(--text-muted); font-weight: 500; font-size: 2.1rem; }
+
+    .provider-card {
+      background: #fafbfe;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .provider-icon {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #dbeafe, #e0e7ff);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .provider-info { flex: 1; min-width: 0; }
+
+    .provider-label {
+      font-size: 0.72rem; font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 0.15rem;
+    }
+
+    .provider-name {
+      font-size: 1.05rem; font-weight: 600;
+      color: var(--text-primary);
+      word-break: break-word; line-height: 1.3;
+    }
+
+    .provider-name.loading { color: var(--text-muted); font-style: italic; font-weight: 500; }
+    .provider-name.error { color: var(--danger); }
+    .provider-name.unknown { color: var(--text-muted); font-style: italic; font-weight: 500; }
+
+    .provider-meta {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 0.25rem;
+      display: none;
+    }
+
+    .provider-meta.visible { display: block; }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--success-light);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #047857;
+      min-height: 44px;
+      transition: all 0.25s ease;
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+      max-height: 0;
+      padding-top: 0; padding-bottom: 0;
+      margin-bottom: 0;
+      overflow: hidden;
+    }
+
+    .status-bar.visible {
+      opacity: 1; transform: translateY(0);
+      pointer-events: auto;
+      max-height: 120px;
+      padding-top: 0.75rem; padding-bottom: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .status-bar.error { background: var(--danger-light); color: #b91c1c; }
+    .status-bar.warning { background: var(--warning-light); color: #92400e; }
+
+    .status-bar .icon { font-size: 1rem; flex-shrink: 0; }
+
+    .ip-mode-switch {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem;
+      background: #f1f5f9;
+      padding: 0.3rem;
+      border-radius: 12px;
+      margin-bottom: 1.25rem;
+    }
+
+    .ip-mode-switch input { display: none; }
+
+    .ip-mode-switch label {
+      text-align: center;
+      padding: 0.6rem 0.5rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      user-select: none;
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.35rem; line-height: 1;
+    }
+
+    .ip-mode-switch label:hover { color: var(--text-primary); }
+
+    .ip-mode-switch input:checked + label {
+      background: #ffffff;
+      color: var(--accent-dark);
+      box-shadow: 0 2px 8px rgba(15, 26, 43, 0.08), 0 0 0 1px rgba(15, 26, 43, 0.04);
+    }
+
+    .ip-mode-switch label .mode-icon { font-size: 0.95rem; }
+
+    .controls { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .select-wrap { position: relative; }
+
+    .select-label {
+      font-size: 0.72rem; font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 0.5rem; display: flex;
+      align-items: center; justify-content: space-between;
+    }
+
+    .ping-info {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+      background: #f1f5f9;
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+    }
+
+    .ping-info .ping-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .ping-info.online {
+      background: var(--success-light);
+      color: #047857;
+    }
+
+    .ping-info.online .ping-dot {
+      background: var(--success);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+      animation: pulse 2s infinite;
+    }
+
+    .ping-info.offline {
+      background: var(--danger-light);
+      color: #b91c1c;
+    }
+
+    .ping-info.offline .ping-dot {
+      background: var(--danger);
+    }
+
+    .ping-info.checking {
+      background: var(--warning-light);
+      color: #92400e;
+    }
+
+    .ping-info.checking .ping-dot {
+      background: var(--warning);
+      animation: pulse 1s infinite;
+    }
+
+    /* === Список статусов всех API === */
+    .api-statuses {
+      background: #fafbfe;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    .api-statuses.visible { display: block; }
+
+    .api-statuses-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .api-statuses-title button {
+      all: unset;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+      padding: 0.15rem 0.4rem;
+      border-radius: 5px;
+      transition: background 0.15s ease;
+      width: auto;
+      text-transform: none;
+    }
+
+    .api-statuses-title button:hover {
+      background: var(--accent-light);
+    }
+
+    .api-status-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .api-status-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      padding: 0.3rem 0.4rem;
+      border-radius: 6px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .api-status-item .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: #cbd5e1;
+    }
+
+    .api-status-item.online .dot {
+      background: var(--success);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+    }
+
+    .api-status-item.offline .dot {
+      background: var(--danger);
+    }
+
+    .api-status-item.checking .dot {
+      background: var(--warning);
+      animation: pulse 1s infinite;
+    }
+
+    .api-status-item .name {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .api-status-item .time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .api-status-item.online .time { color: var(--success); }
+    .api-status-item.offline .time { color: var(--danger); }
+
+    select {
+      width: 100%;
+      padding: 0.85rem 2.75rem 0.85rem 1rem;
+      font-size: 0.95rem;
+      font-family: inherit;
+      font-weight: 500;
+      color: var(--text-primary);
+      background: #fafbfe;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%235b6b82' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1.1rem center;
+    }
+
+    select:hover { border-color: #c7d4e8; background-color: #ffffff; }
+
+    select:focus {
+      border-color: var(--accent);
+      background-color: #ffffff;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+    }
+
+    button.refresh-btn {
+      width: 100%;
+      padding: 0.9rem 1.5rem;
+      font-size: 0.95rem;
+      font-family: inherit;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      color: #ffffff;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 14px -4px rgba(37, 99, 235, 0.5);
+    }
+
+    button.refresh-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px -6px rgba(37, 99, 235, 0.6);
+    }
+
+    button.refresh-btn:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px -2px rgba(37, 99, 235, 0.5);
+    }
+
+    button.refresh-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    button.refresh-btn .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    button.refresh-btn.loading .spinner { display: block; }
+    button.refresh-btn.loading .btn-icon { display: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .footer span { display: flex; align-items: center; gap: 0.35rem; }
+
+    @media (max-width: 480px) {
+      .card { padding: 1.75rem 1.5rem; border-radius: 20px; }
+      .ip-value.v4 { font-size: 1.65rem; }
+      .ip-value.v6 { font-size: 1.05rem; }
+      .header-text h1 { font-size: 1rem; }
+      .logo { width: 40px; height: 40px; }
+      .ip-mode-switch label { font-size: 0.72rem; padding: 0.55rem 0.3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="card">
+      <div class="header">
+        <div class="header-title">
+          <div class="logo">🌍</div>
+          <div class="header-text">
+            <h1>Информация о подключении</h1>
+            <p>IP-адрес и провайдер</p>
+          </div>
+        </div>
+        <div class="badge">
+          <span class="dot"></span>
+          Live
+        </div>
+      </div>
+
+      <div class="ip-mode-switch" role="tablist" aria-label="Протокол IP">
+        <input type="radio" name="ipMode" id="modeAuto" value="auto" checked>
+        <label for="modeAuto"><span class="mode-icon">🔀</span> Оба</label>
+
+        <input type="radio" name="ipMode" id="modeV4" value="v4">
+        <label for="modeV4"><span class="mode-icon">4️⃣</span> IPv4</label>
+
+        <input type="radio" name="ipMode" id="modeV6" value="v6">
+        <label for="modeV6"><span class="mode-icon">6️⃣</span> IPv6</label>
+      </div>
+
+      <div class="section">
+        <div class="section-label">
+          <span>📍 Ваш IP-адрес</span>
+          <span class="ip-type-tag" id="ipTypeTag">—</span>
+        </div>
+        <div class="ip-card">
+          <div class="ip-value placeholder" id="ipDisplay">—</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">
+          <span>📡 Провайдер</span>
+        </div>
+        <div class="provider-card">
+          <div class="provider-icon">🏢</div>
+          <div class="provider-info">
+            <div class="provider-label">Интернет-провайдер</div>
+            <div class="provider-name loading" id="providerDisplay">определяется...</div>
+            <div class="provider-meta" id="providerMeta"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-bar" id="statusBar">
+        <span class="icon" id="statusIcon">✅</span>
+        <span id="statusText">данные получены</span>
+      </div>
+
+      <div class="controls">
+        <div>
+          <label class="select-label" for="serverSelect">
+            <span>Сервер API</span>
+            <span class="ping-info checking" id="pingInfo">
+              <span class="ping-dot"></span>
+              <span id="pingText">проверка...</span>
+            </span>
+          </label>
+          <div class="select-wrap">
+            <select id="serverSelect">
+              <optgroup label="🇷🇺 Российские">
+                <option value="auto-ru">🔄 Авто (только RU)</option>
+                <option value="yandex">Яндекс (yandex.ru/internet)</option>
+                <option value="2ip">2ip.io</option>
+                <option value="sypexgeo">SypexGeo</option>
+                <option value="ipinfo-ru">ipinfo.ru</option>
+              </optgroup>
+              <optgroup label="🌍 Международные">
+                <option value="auto">🔄 Авто (перебор всех)</option>
+                <option value="ipwho">ipwho.is (рекомендуется)</option>
+                <option value="ipapi">ipapi.co</option>
+                <option value="ipinfo">ipinfo.io</option>
+                <option value="myip">myip.com</option>
+                <option value="ipapi-com">ip-api.com</option>
+                <option value="cloudflare">Cloudflare (только IP)</option>
+                <option value="ipify">ipify.org (только IP)</option>
+                <option value="icanhazip">icanhazip.com (только IP)</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="api-statuses" id="apiStatuses">
+            <div class="api-statuses-title">
+              <span>Статус всех API</span>
+              <button type="button" id="recheckBtn">↻ Проверить ещё раз</button>
+            </div>
+            <div class="api-status-list" id="apiStatusList"></div>
+          </div>
+        </div>
+
+        <button class="refresh-btn" id="refreshBtn">
+          <span class="spinner"></span>
+          <span class="btn-icon">⟳</span>
+          <span id="btnText">Обновить данные</span>
+        </button>
+      </div>
+
+      <div class="footer">
+        <span>🔌 <span id="apiSource">API: авто (RU)</span></span>
+        <span>v1.8</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const ipDisplay = document.getElementById('ipDisplay');
+      const providerDisplay = document.getElementById('providerDisplay');
+      const providerMeta = document.getElementById('providerMeta');
+      const statusBar = document.getElementById('statusBar');
+      const statusIcon = document.getElementById('statusIcon');
+      const statusText = document.getElementById('statusText');
+      const refreshBtn = document.getElementById('refreshBtn');
+      const serverSelect = document.getElementById('serverSelect');
+      const apiSource = document.getElementById('apiSource');
+      const btnText = document.getElementById('btnText');
+      const ipTypeTag = document.getElementById('ipTypeTag');
+      const pingInfo = document.getElementById('pingInfo');
+      const pingText = document.getElementById('pingText');
+      const apiStatusList = document.getElementById('apiStatusList');
+      const recheckBtn = document.getElementById('recheckBtn');
+
+      // Кэш статусов: { key: { status: 'online'|'offline'|'checking', ms: number } }
+      const apiStatusCache = {};
+
+      function getIpMode() {
+        const checked = document.querySelector('input[name="ipMode"]:checked');
+        return checked ? checked.value : 'auto';
+      }
+
+      function detectIpType(ip) {
+        if (!ip) return null;
+        return ip.includes(':') ? 'v6' : 'v4';
+      }
+
+      function pickString(...values) {
+        for (const v of values) {
+          if (v == null) continue;
+          const s = String(v).trim();
+          if (s && s.toLowerCase() !== 'null' && s.toLowerCase() !== 'undefined') {
+            return s;
+          }
+        }
+        return null;
+      }
+
+      // === БАЗА API ===
+      const API_PROVIDERS = {
+        // === РОССИЙСКИЕ ===
+        yandex: {
+          name: 'Яндекс',
+          url: 'https://yandex.ru/internet/api/v0/ip',
+          parse: (data) => ({
+            ip: data.ip || null,
+            provider: pickString(
+              data.isp?.name, data.isp?.name_ru,
+              data.organization?.name, data.organization?.name_ru
+            ),
+            country: 'Россия',
+            city: pickString(data.location?.city, data.city)
+          })
+        },
+        '2ip': {
+          name: '2ip.io',
+          url: 'https://ipwho.is/',
+          parse: (data) => {
+            if (data.success === false) throw new Error(data.message || 'ipwho error');
+            return {
+              ip: data.ip || null,
+              provider: pickString(
+                data.connection?.isp, data.connection?.org, data.connection?.domain
+              ),
+              country: data.country || null,
+              city: data.city || null
+            };
+          }
+        },
+        sypexgeo: {
+          name: 'SypexGeo',
+          url: 'https://api.sypexgeo.net/json/',
+          parse: (data) => {
+            if (data.error) throw new Error(data.error);
+            const ip = data.ip || data.network?.ip || null;
+            const provider = pickString(
+              data.isp?.name_ru, data.isp?.name_en, data.isp?.name,
+              data.isp?.org, data.isp?.organization
+            );
+            const country = pickString(
+              data.country?.name_ru, data.country?.name_en, data.country?.name
+            );
+            const city = pickString(data.city?.name_ru, data.city?.name_en, data.city?.name);
+            return { ip, provider, country, city };
+          }
+        },
+        'ipinfo-ru': {
+          name: 'ipinfo.ru',
+          customFetch: async (mode) => {
+            const ipifyUrl = mode === 'v6'
+              ? 'https://api6.ipify.org?format=json'
+              : 'https://api.ipify.org?format=json';
+            const ipResp = await fetch(ipifyUrl);
+            if (!ipResp.ok) throw new Error('Не удалось определить IP');
+            const ipData = await ipResp.json();
+            const myIp = ipData.ip;
+
+            const infoResp = await fetch(`https://ipinfo.ru/api/ip/${myIp}`);
+            if (!infoResp.ok) throw new Error(`HTTP ${infoResp.status}`);
+            const info = await infoResp.json();
+
+            return {
+              ip: myIp,
+              provider: pickString(info.isp, info.org, info.provider, info.organization),
+              country: pickString(info.country, info.country_name),
+              city: pickString(info.city, info.region)
+            };
+          }
+        },
+
+        // === МЕЖДУНАРОДНЫЕ ===
+        ipwho: {
+          name: 'ipwho.is',
+          urls: {
+            any: 'https://ipwho.is/',
+            v4: 'https://ipv4.ipwho.is/',
+            v6: 'https://ipv6.ipwho.is/'
+          },
+          parse: (data) => {
+            if (data.success === false) throw new Error(data.message || 'ipwho error');
+            return {
+              ip: data.ip,
+              provider: pickString(
+                data.connection?.isp, data.connection?.org, data.connection?.domain
+              ),
+              country: data.country || null,
+              city: data.city || null
+            };
+          }
+        },
+        ipapi: {
+          name: 'ipapi.co',
+          urls: {
+            any: 'https://ipapi.co/json/',
+            v4: 'https://ipapi.co/json/',
+            v6: 'https://ipapi.co/json/'
+          },
+          parse: (data) => {
+            if (data.error) throw new Error(data.reason || 'ipapi error');
+            return {
+              ip: data.ip,
+              provider: pickString(data.org, data.asn),
+              country: data.country_name || data.country || null,
+              city: data.city || null
+            };
+          }
+        },
+        ipinfo: {
+          name: 'ipinfo.io',
+          url: 'https://ipinfo.io/json',
+          parse: (data) => ({
+            ip: data.ip,
+            provider: pickString(data.org),
+            country: data.country || null,
+            city: data.city || null
+          })
+        },
+        myip: {
+          name: 'myip.com',
+          url: 'https://api.myip.com',
+          parse: (data) => ({
+            ip: data.ip,
+            provider: null,
+            country: data.country || null,
+            city: null
+          })
+        },
+        'ipapi-com': {
+          name: 'ip-api.com',
+          url: 'http://ip-api.com/json/?fields=status,message,country,countryCode,regionName,city,isp,org,as,query&lang=ru',
+          parse: (data) => {
+            if (data.status === 'fail') throw new Error(data.message || 'ip-api error');
+            return {
+              ip: data.query,
+              provider: pickString(data.isp, data.org, data.as),
+              country: data.country || null,
+              city: pickString(data.city, data.regionName)
+            };
+          }
+        },
+        cloudflare: {
+          name: 'Cloudflare',
+          url: 'https://1.1.1.1/cdn-cgi/trace',
+          isText: true,
+          parse: (text) => {
+            const map = {};
+            text.split('\n').forEach(line => {
+              const idx = line.indexOf('=');
+              if (idx > 0) map[line.substring(0, idx)] = line.substring(idx + 1);
+            });
+            return {
+              ip: map.ip || null,
+              provider: null,
+              country: map.loc || null,
+              city: null,
+              locationHint: map.loc
+            };
+          }
+        },
+        ipify: {
+          name: 'ipify.org',
+          urls: {
+            any: 'https://api.ipify.org?format=json',
+            v4: 'https://api.ipify.org?format=json',
+            v6: 'https://api6.ipify.org?format=json'
+          },
+          parse: (data) => ({ ip: data.ip, provider: null, country: null, city: null })
+        },
+        icanhazip: {
+          name: 'icanhazip.com',
+          urls: {
+            any: 'https://icanhazip.com',
+            v4: 'https://ipv4.icanhazip.com',
+            v6: 'https://ipv6.icanhazip.com'
+          },
+          isText: true,
+          parse: (text) => ({ ip: text.trim() || null, provider: null, country: null, city: null })
+        }
+      };
+
+      const AUTO_ORDER = ['ipwho', 'ipapi', 'ipinfo', 'ipapi-com', 'myip', 'cloudflare', 'ipify', 'icanhazip'];
+      const AUTO_RU_ORDER = ['yandex', '2ip', 'sypexgeo', 'ipinfo-ru', 'ipwho', 'ipapi'];
+      const RU_ONLY_V4 = new Set(['yandex', '2ip', 'sypexgeo', 'ipapi-com', 'ipinfo']);
+
+      // === ПРОВЕРКА ДОСТУПНОСТИ API (PING) ===
+      function getPingUrl(key) {
+        const provider = API_PROVIDERS[key];
+        if (!provider) return null;
+        if (provider.urls) return provider.urls.any;
+        return provider.url;
+      }
+
+      async function pingApi(key) {
+        const url = getPingUrl(key);
+        if (!url) return { status: 'offline', ms: null };
+
+        const start = performance.now();
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+        try {
+          // Используем HEAD или GET с no-cors-фолбэком
+          const response = await fetch(url, {
+            method: 'GET',
+            signal: controller.signal,
+            cache: 'no-store'
+          });
+          clearTimeout(timeoutId);
+          const ms = Math.round(performance.now() - start);
+
+          // Любой ответ (даже 4xx) означает, что сервер живой
+          return { status: 'online', ms };
+        } catch (e) {
+          clearTimeout(timeoutId);
+          // Даже если CORS-ошибка — это не значит, что сервер офлайн
+          // Но без ответа мы не можем это гарантировать. Считаем offline,
+          // если это не abort (таймаут).
+          if (e.name === 'AbortError') {
+            return { status: 'offline', ms: null };
+          }
+          // Пробуем no-cors как последний шанс — если вернётся opaque-ответ, значит живой
+          try {
+            const start2 = performance.now();
+            await fetch(url, { method: 'HEAD', mode: 'no-cors', cache: 'no-store' });
+            const ms = Math.round(performance.now() - start2);
+            return { status: 'online', ms };
+          } catch (e2) {
+            return { status: 'offline', ms: null };
+          }
+        }
+      }
+
+      function updatePingUI(key) {
+        const status = apiStatusCache[key];
+        if (!status) return;
+
+        pingInfo.classList.remove('online', 'offline', 'checking');
+        pingInfo.classList.add(status.status);
+
+        if (status.status === 'online') {
+          pingText.textContent = `${status.ms} мс`;
+        } else if (status.status === 'offline') {
+          pingText.textContent = 'недоступен';
+        } else {
+          pingText.textContent = 'проверка...';
+        }
+      }
+
+      function renderApiStatusList() {
+        const keys = Object.keys(API_PROVIDERS);
+        apiStatusList.innerHTML = '';
+
+        keys.forEach(key => {
+          const provider = API_PROVIDERS[key];
+          const status = apiStatusCache[key] || { status: 'checking', ms: null };
+
+          const item = document.createElement('div');
+          item.className = 'api-status-item ' + status.status;
+
+          const dot = document.createElement('span');
+          dot.className = 'dot';
+
+          const name = document.createElement('span');
+          name.className = 'name';
+          name.textContent = provider.name;
+
+          const time = document.createElement('span');
+          time.className = 'time';
+          if (status.status === 'online' && status.ms != null) {
+            time.textContent = `${status.ms} мс`;
+          } else if (status.status === 'offline') {
+            time.textContent = 'offline';
+          } else {
+            time.textContent = '...';
+          }
+
+          item.appendChild(dot);
+          item.appendChild(name);
+          item.appendChild(time);
+          apiStatusList.appendChild(item);
+        });
+      }
+
+      async function checkAllApis() {
+        const keys = Object.keys(API_PROVIDERS);
+
+        // Сброс кэша в состояние "проверка"
+        keys.forEach(k => { apiStatusCache[k] = { status: 'checking', ms: null }; });
+        renderApiStatusList();
+
+        // Обновляем UI для выбранного
+        const selected = serverSelect.value;
+        if (API_PROVIDERS[selected]) {
+          updatePingUI(selected);
+        } else {
+          pingInfo.classList.remove('online', 'offline', 'checking');
+          pingInfo.classList.add('checking');
+          pingText.textContent = 'авто-режим';
+        }
+
+        // Проверяем параллельно
+        await Promise.all(keys.map(async (key) => {
+          const result = await pingApi(key);
+          apiStatusCache[key] = result;
+          renderApiStatusList();
+          if (key === serverSelect.value) updatePingUI(key);
+        }));
+      }
+
+      // === ОСНОВНАЯ ЛОГИКА ===
+      function showStatus(text, type = 'success') {
+        statusText.textContent = text;
+        statusIcon.textContent = type === 'error' ? '⚠️' : (type === 'warning' ? 'ℹ️' : (type === 'loading' ? '⏳' : '✅'));
+        statusBar.classList.remove('error', 'warning');
+        if (type === 'error') statusBar.classList.add('error');
+        else if (type === 'warning') statusBar.classList.add('warning');
+        statusBar.classList.add('visible');
+      }
+
+      function hideStatus() {
+        statusBar.classList.remove('visible');
+      }
+
+      function setLoadingState(text) {
+        ipDisplay.textContent = '—';
+        ipDisplay.className = 'ip-value placeholder';
+        ipTypeTag.className = 'ip-type-tag';
+        ipTypeTag.textContent = '—';
+        providerDisplay.textContent = text || 'определяется...';
+        providerDisplay.className = 'provider-name loading';
+        providerMeta.className = 'provider-meta';
+        providerMeta.textContent = '';
+        refreshBtn.disabled = true;
+        refreshBtn.classList.add('loading');
+        btnText.textContent = 'Загрузка...';
+        hideStatus();
+      }
+
+      function setErrorState(message) {
+        ipDisplay.textContent = '—';
+        ipDisplay.className = 'ip-value placeholder';
+        ipTypeTag.className = 'ip-type-tag';
+        ipTypeTag.textContent = '—';
+        providerDisplay.textContent = 'не удалось определить';
+        providerDisplay.className = 'provider-name error';
+        providerMeta.className = 'provider-meta';
+        providerMeta.textContent = '';
+        refreshBtn.disabled = false;
+        refreshBtn.classList.remove('loading');
+        btnText.textContent = 'Повторить';
+        showStatus(message || 'Ошибка при получении данных', 'error');
+      }
+
+      function setSuccessState(parsed, note, warn) {
+        const { ip, provider, country, city } = parsed;
+        const type = detectIpType(ip);
+
+        ipDisplay.textContent = ip || 'неизвестен';
+        ipDisplay.className = 'ip-value ' + (type === 'v6' ? 'v6' : 'v4');
+
+        if (type) {
+          ipTypeTag.textContent = type === 'v6' ? 'IPv6' : 'IPv4';
+          ipTypeTag.className = 'ip-type-tag ' + type;
+        } else {
+          ipTypeTag.className = 'ip-type-tag';
+          ipTypeTag.textContent = '—';
+        }
+
+        if (provider) {
+          providerDisplay.textContent = provider;
+          providerDisplay.className = 'provider-name';
+        } else {
+          providerDisplay.textContent = 'не определён этим API';
+          providerDisplay.className = 'provider-name unknown';
+        }
+
+        const metaParts = [];
+        if (country) metaParts.push(`🌍 ${country}`);
+        if (city && city !== country) metaParts.push(`🏙 ${city}`);
+        if (metaParts.length) {
+          providerMeta.textContent = metaParts.join('  ·  ');
+          providerMeta.className = 'provider-meta visible';
+        } else {
+          providerMeta.className = 'provider-meta';
+          providerMeta.textContent = '';
+        }
+
+        refreshBtn.disabled = false;
+        refreshBtn.classList.remove('loading');
+        btnText.textContent = 'Обновить данные';
+
+        let msg;
+        if (country && city) msg = `${country} · ${city}`;
+        else if (country) msg = country;
+        else if (note) msg = note;
+        else msg = 'данные получены';
+
+        if (!provider) {
+          showStatus(`IP определён, но провайдер недоступен в этом API`, 'warning');
+        } else {
+          showStatus(msg, warn ? 'warning' : 'success');
+        }
+      }
+
+      async function fetchWithTimeout(url, options = {}, timeout = 8000) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+        try {
+          const response = await fetch(url, { ...options, signal: controller.signal });
+          clearTimeout(id);
+          return response;
+        } catch (e) {
+          clearTimeout(id);
+          throw e;
+        }
+      }
+
+      function resolveUrl(provider, mode) {
+        if (provider.customFetch) return null;
+        if (provider.urls) return provider.urls[mode] || provider.urls.any;
+        return provider.url;
+      }
+
+      async function tryProvider(key, mode) {
+        const provider = API_PROVIDERS[key];
+        if (!provider) throw new Error('Неизвестный API');
+
+        if (mode === 'v6' && RU_ONLY_V4.has(key) && !provider.urls?.v6) {
+          throw new Error(`${provider.name} не поддерживает IPv6`);
+        }
+
+        if (provider.customFetch) {
+          const parsed = await provider.customFetch(mode);
+          if (!parsed.ip) throw new Error('IP не получен');
+          const type = detectIpType(parsed.ip);
+          if (mode === 'v6' && type !== 'v6') throw new Error(`Вернулся IPv4 вместо IPv6`);
+          if (mode === 'v4' && type !== 'v4') throw new Error(`Вернулся IPv6 вместо IPv4`);
+          return { key, provider, parsed };
+        }
+
+        const url = resolveUrl(provider, mode);
+        if (!url) throw new Error('URL не задан для режима');
+
+        const response = await fetchWithTimeout(url, {}, 8000);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        let parsed;
+        if (provider.isText) parsed = provider.parse(await response.text());
+        else parsed = provider.parse(await response.json());
+
+        if (!parsed.ip) throw new Error('IP не получен');
+
+        const type = detectIpType(parsed.ip);
+        if (mode === 'v6' && type !== 'v6') throw new Error(`${provider.name} вернул IPv4`);
+        if (mode === 'v4' && type !== 'v4') throw new Error(`${provider.name} вернул IPv6`);
+
+        return { key, provider, parsed };
+      }
+
+      async function runAuto(order, mode, labelPrefix) {
+        for (const key of order) {
+          if (!API_PROVIDERS[key]) continue;
+          try {
+            providerDisplay.textContent = `пробую ${API_PROVIDERS[key].name}...`;
+            providerDisplay.className = 'provider-name loading';
+            const result = await tryProvider(key, mode);
+            apiSource.textContent = `API: ${result.provider.name}`;
+            setSuccessState(result.parsed, `${labelPrefix} ${result.provider.name}`);
+            return true;
+          } catch (e) {
+            console.warn(`[${key}] ошибка:`, e.message);
+          }
+        }
+        return false;
+      }
+
+      async function fetchIpAndProvider() {
+        const selected = serverSelect.value;
+        const mode = getIpMode();
+
+        if (selected === 'auto-ru') {
+          apiSource.textContent = 'API: авто (RU)';
+          setLoadingState('перебор RU-серверов...');
+          const ok = await runAuto(AUTO_RU_ORDER, mode, '✓');
+          if (!ok) setErrorState('Российские серверы недоступны. Попробуйте другой API или режим "Оба".');
+          return;
+        }
+
+        if (selected === 'auto') {
+          apiSource.textContent = 'API: авто-перебор';
+          setLoadingState('перебор серверов...');
+          const ok = await runAuto(AUTO_ORDER, mode, '✓');
+          if (!ok) setErrorState('Все серверы недоступны. Проверьте интернет.');
+          return;
+        }
+
+        const provider = API_PROVIDERS[selected];
+        if (!provider) {
+          setErrorState('Неизвестный API сервер');
+          return;
+        }
+
+        apiSource.textContent = `API: ${provider.name}`;
+        setLoadingState();
+
+        try {
+          const result = await tryProvider(selected, mode);
+          setSuccessState(result.parsed);
+        } catch (err) {
+          console.error('Ошибка:', err);
+          let msg = 'Не удалось получить данные.';
+          if (err.name === 'AbortError') msg = 'Превышено время ожидания.';
+          else if (err.message.includes('Failed to fetch')) msg = 'Ошибка сети или CORS. Проверьте подключение.';
+          else if (err.message) msg = `Ошибка: ${err.message}`;
+
+          if (mode === 'v6' && RU_ONLY_V4.has(selected)) {
+            msg = `${provider.name} не поддерживает IPv6. Выберите режим "Оба" или другой сервер.`;
+          }
+
+          setErrorState(msg);
+        }
+      }
+
+      // === ОБРАБОТЧИКИ ===
+      refreshBtn.addEventListener('click', () => {
+        fetchIpAndProvider();
+        checkAllApis();
+      });
+
+      serverSelect.addEventListener('change', () => {
+        fetchIpAndProvider();
+        const key = serverSelect.value;
+        if (apiStatusCache[key]) {
+          updatePingUI(key);
+        } else if (key === 'auto' || key === 'auto-ru') {
+          pingInfo.classList.remove('online', 'offline');
+          pingInfo.classList.add('checking');
+          pingText.textContent = 'авто-режим';
+        } else {
+          pingInfo.classList.remove('online', 'offline', 'checking');
+          pingInfo.classList.add('checking');
+          pingText.textContent = 'проверка...';
+          pingApi(key).then(r => {
+            apiStatusCache[key] = r;
+            updatePingUI(key);
+            renderApiStatusList();
+          });
+        }
+      });
+
+      document.querySelectorAll('input[name="ipMode"]').forEach(radio => {
+        radio.addEventListener('change', fetchIpAndProvider);
+      });
+
+      recheckBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        checkAllApis();
+      });
+
+      window.addEventListener('DOMContentLoaded', () => {
+        fetchIpAndProvider();
+        checkAllApis();
+      });
+    })();
+  </script>
+</body>
+</html>
